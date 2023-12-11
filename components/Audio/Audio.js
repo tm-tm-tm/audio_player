@@ -14,6 +14,7 @@ import UnmuteSVG from '@/assets/svg/UnmuteSVG'
 import PreviousTrackSVG from '@/assets/svg/PreviousTrackSVG'
 import NextTrackSVG from '@/assets/svg/NextTrackSVG'
 import LoopSVG from '@/assets/svg/LoopSVG'
+import Ellipsis from '../Ellipsis/Ellipsis'
 
 const Audio = () => {
     const audioRef = useRef()
@@ -276,9 +277,13 @@ const Audio = () => {
                     <div className={styles.playlistTracks}>
                         {
                             loading ?
-                                <p>
-                                    Loading...
-                                </p>
+                                <ul>
+                                    <li>
+                                        <p>
+                                            loading <Ellipsis />
+                                        </p>
+                                    </li>
+                                </ul>
                                 :
                                 <ul>
                                     {playlist.map((track, index) => (
