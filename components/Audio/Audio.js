@@ -32,9 +32,6 @@ const Audio = () => {
         // audioRef.current.src = playlist[0].audioURL
         // setCurrentTrackArtwork(playlist[0].artworkUrl);
         readPlaylist()
-        console.log("Playlist", playlist)
-        console.log("Current Track:", currentTrack)
-        console.log("Current Track Audio Source:", audioRef.current.src)
     }, [])
 
     useEffect(() => {
@@ -72,8 +69,6 @@ const Audio = () => {
             }
 
             setPlaylist(data)
-            console.log('Fetched data:', data)
-
             setLoading(false)
         } catch (error) {
             console.error('Error:', error.message)
