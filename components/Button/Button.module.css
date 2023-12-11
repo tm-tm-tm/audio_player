@@ -1,0 +1,58 @@
+.background {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* box-shadow: 0px 1px 1px 0px #ffffff inset; */
+    background: linear-gradient(180deg, rgba(161, 161, 161, 0.5) 0%, rgba(234, 234, 234, 0.47) 100%);
+}
+
+.middle {
+    position: absolute;
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    border-radius: 6px;
+    box-sizing: border-box;
+    text-decoration: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(180deg, #EEE 0%, #EAEAEA 100%);
+    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.40);
+    transition: box-shadow 0.2s cubic-bezier(0.8, 0, 0.2, 1);
+}
+
+.inner {
+    position: absolute;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    cursor: pointer;
+    background: linear-gradient(180deg, white 0%, white 50%, white 100%);
+    transition: width 0.2s cubic-bezier(0.8, 0, 0.2, 1), height 0.2s cubic-bezier(0.8, 0, 0.2, 1);
+}
+
+.inner:active {
+    width: calc(100% - 12px);
+    height: calc(100% - 12px);
+}
+
+.selected {
+    width: calc(100% - 14px);
+    height: calc(100% - 14px);
+}
+
+.selectedShadow {
+    box-shadow: 0px 0px 2px 0.5px rgba(0, 0, 0, 0.40);
+}
