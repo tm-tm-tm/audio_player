@@ -26,7 +26,7 @@ const Audio = () => {
     const [isLooping, setIsLooping] = useState(false)
     const [isMuted, setIsMuted] = useState(false)
     const [isScrubbing, setIsScrubbing] = useState(false)
-    const [currentTrack, setCurrentTrack] = useState(0);
+    const [currentTrack, setCurrentTrack] = useState(null);
     const [currentTrackArtwork, setCurrentTrackArtwork] = useState(null);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const Audio = () => {
     }, [])
 
     useEffect(() => {
-        // Set the initial track from the dynamic datad        
+        // Set the initial track from the dynamic data        
         if (playlist.length > 0) {
             audioRef.current.src = playlist[0].audio_Url;
             setCurrentTrackArtwork(playlist[0].artwork_Url);
@@ -233,7 +233,7 @@ const Audio = () => {
 
                         {imageLoading &&
                             <p className={styles.imageLoading}>
-                                loading...
+                                Loading...
                             </p>
                         }
 
