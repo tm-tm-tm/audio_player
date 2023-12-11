@@ -20,6 +20,7 @@ const Audio = () => {
     const progressBarRef = useRef()
     const durationRef = useRef()
     const [loading, setLoading] = useState(false)
+    const [imageLoading, setImageLoading] = useState(true);
     const [playlist, setPlaylist] = useState([])
     const [isPlaying, setIsPlaying] = useState(false)
     const [isLooping, setIsLooping] = useState(false)
@@ -35,7 +36,7 @@ const Audio = () => {
     }, [])
 
     useEffect(() => {
-        // Set the initial track from the dynamic data        
+        // Set the initial track from the dynamic datad        
         if (playlist.length > 0) {
             audioRef.current.src = playlist[0].audio_Url;
             setCurrentTrackArtwork(playlist[0].artwork_Url);
@@ -229,7 +230,14 @@ const Audio = () => {
             <div className={styles.playlistContainer}>
                 <div className={styles.artworkContainer}>
                     <div className={styles.artworkInner}>
-                        {currentTrackArtwork &&
+
+                        {imageLoading &&
+                            <p className={styles.imageLoading}>
+                                loading...
+                            </p>
+                        }
+
+                        {currentTrackArtwork && (
                             <Image
                                 src={currentTrackArtwork}
                                 // width={360}
@@ -238,8 +246,9 @@ const Audio = () => {
                                 fill
                                 alt="Artwork"
                                 className={styles.image}
+                                onLoad={() => setImageLoading(false)}
                             />
-                        }
+                        )}
                     </div>
                 </div>
 
