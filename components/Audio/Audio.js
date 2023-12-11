@@ -27,6 +27,7 @@ const Audio = () => {
     const [isMuted, setIsMuted] = useState(false)
     const [isScrubbing, setIsScrubbing] = useState(false)
     const [currentTrack, setCurrentTrack] = useState(null);
+    const [currentTrackDescription, setCurrentTrackDescription] = useState('');
     const [currentTrackArtwork, setCurrentTrackArtwork] = useState(null);
 
     useEffect(() => {
@@ -40,6 +41,7 @@ const Audio = () => {
         if (playlist.length > 0) {
             audioRef.current.src = playlist[0].audio_Url;
             setCurrentTrackArtwork(playlist[0].artwork_Url);
+            setCurrentTrackDescription(playlist[0].description);
             setCurrentTrack(0);
         }
     }, [playlist]);
@@ -83,6 +85,7 @@ const Audio = () => {
 
         audioRef.current.src = playlist[index].audio_Url;
         setCurrentTrackArtwork(playlist[index].artwork_Url);
+        setCurrentTrackDescription(playlist[index].description);
         setCurrentTrack(index)
         restartTrack()
         playTrack()
@@ -104,10 +107,12 @@ const Audio = () => {
             audioRef.current.src = playlist[nextTrack].audio_Url;
             setCurrentTrack(nextTrack);
             setCurrentTrackArtwork(playlist[nextTrack].artwork_Url);
+            setCurrentTrackDescription(playlist[nextTrack].description);
         } else {
             audioRef.current.src = playlist[0].audio_Url;
             setCurrentTrack(0);
             setCurrentTrackArtwork(playlist[0].artwork_Url);
+            setCurrentTrackDescription(playlist[0].description);
         }
 
         restartTrack();
@@ -120,6 +125,8 @@ const Audio = () => {
         if (previousTrack >= 0) {
             audioRef.current.src = playlist[previousTrack].audio_Url;
             setCurrentTrack(previousTrack);
+            setCurrentTrackArtwork(playlist[previousTrack].artwork_Url);
+            setCurrentTrackDescription(playlist[previousTrack].description);
         } else {
             restartTrack();
         }
@@ -251,6 +258,16 @@ const Audio = () => {
                         )}
                     </div>
                 </div>
+
+                {/* <div className={styles.descriptionContainer}>
+                    <div className={styles.descriptionInner}>
+                        {currentTrackDescription && (
+                            <p>
+                                {currentTrackDescription}
+                            </p>
+                        )}
+                    </div>
+                </div> */}
 
                 <div className={styles.playlist}>
                     {/* <p className={styles.playlistTitle}>

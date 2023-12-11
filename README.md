@@ -1,6 +1,6 @@
 ## Audio Player
 
-An audio player for unreleases ideas.
+An audio player for unreleased ideas.
 
 Built with [Next.js](https://nextjs.org/). [Supabase](https://supabase.com/) for metadata and object storage. Analytics and deployment via [Vercel](https://vercel.com/home).
 
