@@ -72,7 +72,22 @@ const Audio = () => {
                 return
             }
 
-            setPlaylist(data)
+            // Fetch durations for each track
+            const tracksWithDurations = await Promise.all(data.map(async (track) => {
+                const audio = document.createElement('audio');
+                audio.src = track.audio_Url;
+
+                return new Promise((resolve) => {
+                    audio.onloadedmetadata = () => {
+                        resolve({ ...track, duration: audio.duration });
+                    };
+                });
+            }));
+
+            setPlaylist(tracksWithDurations);
+            console.log(tracksWithDurations)
+
+            // setPlaylist(data)
             setLoading(false)
         } catch (error) {
             console.error('Error:', error.message)
@@ -134,7 +149,6 @@ const Audio = () => {
 
         playTrack();
     };
-
 
     const handleTrackEnd = () => {
         if (isLooping) {
@@ -301,6 +315,9 @@ const Audio = () => {
                                             {/* <p>
                                                 {formatDate(track.created_at)}
                                             </p> */}
+                                            <p>
+                                                {formatTime(track.duration)}
+                                            </p>
                                         </li>
                                     ))}
                                 </ul>
