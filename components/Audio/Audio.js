@@ -346,7 +346,9 @@ const Audio = () => {
                                     loading ?
                                         <tr>
                                             <td>
-                                                loading <Ellipsis />
+                                                <p>
+                                                    loading <Ellipsis />
+                                                </p>
                                             </td>
                                         </tr>
                                         :
