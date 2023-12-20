@@ -15,25 +15,28 @@ import PreviousTrackSVG from '@/assets/svg/PreviousTrackSVG'
 import NextTrackSVG from '@/assets/svg/NextTrackSVG'
 import LoopSVG from '@/assets/svg/LoopSVG'
 import Ellipsis from '../Ellipsis/Ellipsis'
+import AudioTimeline from '../AudioTimeline/AudioTimeline'
 
 const Audio = () => {
     const audioRef = useRef()
     const progressBarRef = useRef()
     const durationRef = useRef()
+
     const [loading, setLoading] = useState(false)
-    const [imageLoading, setImageLoading] = useState(true);
     const [playlist, setPlaylist] = useState([])
+    const [currentTrack, setCurrentTrack] = useState(null);
+    const [currentTrackDescription, setCurrentTrackDescription] = useState('');
+    const [currentTrackArtwork, setCurrentTrackArtwork] = useState(null);
+    const [artworkLoading, setArtworkLoading] = useState(true);
+    const [playCounts, setPlayCounts] = useState({});
+
     const [isPlaying, setIsPlaying] = useState(false)
     const [isLooping, setIsLooping] = useState(false)
     const [isMuted, setIsMuted] = useState(false)
     const [isScrubbing, setIsScrubbing] = useState(false)
-    const [currentTrack, setCurrentTrack] = useState(null);
-    const [currentTrackDescription, setCurrentTrackDescription] = useState('');
-    const [currentTrackArtwork, setCurrentTrackArtwork] = useState(null);
+    // const [playbackRate, setPlaybackRate] = useState(1);
 
     useEffect(() => {
-        // audioRef.current.src = playlist[0].audioURL
-        // setCurrentTrackArtwork(playlist[0].artworkUrl);
         readPlaylist()
     }, [])
 
@@ -65,14 +68,14 @@ const Audio = () => {
         try {
             const { data, error } = await supabase
                 .from('Playlist')
-                .select('*');
+                .select('*')
+                .order('id', { ascending: true })
 
             if (error) {
                 console.error('Error fetching data:', error.message)
                 return
             }
 
-            // Fetch durations for each track
             const tracksWithDurations = await Promise.all(data.map(async (track) => {
                 const audio = document.createElement('audio');
                 audio.src = track.audio_Url;
@@ -84,17 +87,51 @@ const Audio = () => {
                 });
             }));
 
-            setPlaylist(tracksWithDurations);
-            console.log(tracksWithDurations)
+            const newPlayCounts = {};
+            data.forEach(track => {
+                newPlayCounts[track.id] = track.play_count;
+            });
 
-            // setPlaylist(data)
+            setPlaylist(tracksWithDurations)
+            setPlayCounts(newPlayCounts);
             setLoading(false)
         } catch (error) {
             console.error('Error:', error.message)
         }
     }
 
-    const handleTrackSelection = (index) => {
+    const incrementPlayCount = async (trackId) => {
+        try {
+            // First, get the current play count
+            let { data: trackData, error: getError } = await supabase
+                .from('Playlist')
+                .select('play_count')
+                .eq('id', trackId)
+                .single();
+
+            if (getError) throw getError;
+
+            // Then, increment the play count and update the database
+            const newPlayCount = trackData.play_count + 1;
+            const { error: updateError } = await supabase
+                .from('Playlist')
+                .update({ play_count: newPlayCount })
+                .eq('id', trackId);
+
+            if (updateError) throw updateError;
+
+            // Optimistically update the local state
+            setPlayCounts(prevCounts => ({
+                ...prevCounts,
+                [trackId]: (prevCounts[trackId] || 0) + 1
+            }));
+
+        } catch (error) {
+            console.error('Error incrementing play count:', error.message);
+        }
+    }
+
+    const handleTrackSelection = async (index) => {
         if (index === currentTrack) {
             return;
         }
@@ -107,16 +144,20 @@ const Audio = () => {
         playTrack()
     };
 
-    const playTrack = () => {
-        audioRef.current.play()
-        setIsPlaying(true)
-    }
+    const playTrack = async () => {
+        if (currentTrack !== null) {
+            audioRef.current.play();
+            setIsPlaying(true)
 
-    const restartTrack = () => {
+            await incrementPlayCount(playlist[currentTrack].id);
+        }
+    };
+
+    const restartTrack = async () => {
         audioRef.current.currentTime = 0;
     }
 
-    const nextTrack = () => {
+    const nextTrack = async () => {
         const nextTrack = currentTrack + 1;
 
         if (nextTrack < playlist.length) {
@@ -135,7 +176,7 @@ const Audio = () => {
         playTrack();
     };
 
-    const previousTrack = () => {
+    const previousTrack = async () => {
         const previousTrack = currentTrack - 1;
 
         if (previousTrack >= 0) {
@@ -158,7 +199,7 @@ const Audio = () => {
         }
     }
 
-    const togglePlayPause = () => {
+    const togglePlayPause = async () => {
         const audio = audioRef.current
 
         if (audio) {
@@ -190,15 +231,11 @@ const Audio = () => {
         }
     }
 
-    const formatDate = (timestamp) => {
-        return moment(timestamp).format('DD-MM-YYYY');
-    }
-
-    const formatTime = (timeInSeconds) => {
-        const duration = moment.duration(timeInSeconds, 'seconds')
-        const formattedTime = moment.utc(duration.asMilliseconds()).format('m:ss')
-        return formattedTime
-    }
+    // const handlePlaybackRateChange = (event) => {
+    //     const newRate = parseFloat(event.target.value);
+    //     setPlaybackRate(newRate);
+    //     audioRef.current.playbackRate = newRate;
+    // };
 
     const updateProgressBar = () => {
         const audio = audioRef.current
@@ -247,14 +284,23 @@ const Audio = () => {
         setIsScrubbing(false)
     }
 
+    const formatDate = (timestamp) => {
+        return moment(timestamp).format('DD.MM.YYYY');
+    }
+
+    const formatTime = (timeInSeconds) => {
+        const duration = moment.duration(timeInSeconds, 'seconds')
+        const formattedTime = moment.utc(duration.asMilliseconds()).format('m:ss')
+        return formattedTime
+    }
+
     return (
         <>
             <div className={styles.playlistContainer}>
                 <div className={styles.artworkContainer}>
                     <div className={styles.artworkInner}>
-
-                        {imageLoading &&
-                            <p className={styles.imageLoading}>
+                        {artworkLoading &&
+                            <p className={styles.artworkLoading}>
                                 Loading...
                             </p>
                         }
@@ -268,7 +314,7 @@ const Audio = () => {
                                 fill
                                 alt="Artwork"
                                 className={styles.image}
-                                onLoad={() => setImageLoading(false)}
+                                onLoad={() => setArtworkLoading(false)}
                             />
                         )}
                     </div>
@@ -285,54 +331,51 @@ const Audio = () => {
                 </div> */}
 
                 <div className={styles.playlist}>
-                    {/* <p className={styles.playlistTitle}>
-                        PLAYLIST
-                    </p> */}
                     <div className={styles.playlistTracks}>
-                        {
-                            loading ?
-                                <ul>
-                                    <li>
-                                        <p>
-                                            loading <Ellipsis />
-                                        </p>
-                                    </li>
-                                </ul>
-                                :
-                                <ul>
-                                    {playlist.map((track, index) => (
-                                        <li
-                                            key={index}
-                                            onClick={() => handleTrackSelection(index)}
-                                            className={index === currentTrack ? styles.activeTrack : ''}
-                                        >
-                                            <p>
-                                                {track.title}
-                                            </p>
-                                            <p>
-                                                {track.artist}
-                                            </p>
-                                            {/* <p>
-                                                {formatDate(track.created_at)}
-                                            </p> */}
-                                            <p>
-                                                {formatTime(track.duration)}
-                                            </p>
-                                        </li>
-                                    ))}
-                                </ul>
-                        }
+                        <table className={styles.playlistTable}>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Artist</th>
+                                    <th>Plays</th>
+                                    <th>Date Added</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    loading ?
+                                        <tr>
+                                            <td>
+                                                loading <Ellipsis />
+                                            </td>
+                                        </tr>
+                                        :
+                                        <>
+                                            {playlist.map((track, id) => (
+                                                <tr
+                                                    key={id}
+                                                    onClick={() => handleTrackSelection(id)}
+                                                    className={id === currentTrack ? styles.activeTrack : ''}
+                                                >
+                                                    <td>{track.title}</td>
+                                                    <td>{track.artist}</td>
+                                                    <td>{playCounts[track.id] || 0}</td>
+                                                    <td>{formatDate(track.created_at)}</td>
+                                                    <td>{formatTime(track.duration)}</td>
+                                                </tr>
+                                            ))}
+                                        </>
+                                }
+                            </tbody>
+                        </table>
                     </div>
 
                     <div className={styles.container}>
 
                         <div className={styles.audioPanel}>
-
                             <div className={styles.audioPlayer}>
-                                <audio
-                                    ref={audioRef}
-                                    onTimeUpdate={updateProgressBar}
-                                >
+                                <audio ref={audioRef} onTimeUpdate={updateProgressBar}>
                                     <source
                                         // src=""
                                         type="audio/mpeg"
@@ -350,17 +393,25 @@ const Audio = () => {
                                     </Button>
                                 </div>
 
-                                <div
-                                    className={styles.progressBackground}
-                                >
-                                    {/* <div>
-                                        <span
-                                            className={styles.previousTrack}
-                                            onClick={previousTrack}
-                                        >
-                                            <PreviousTrackSVG />
-                                        </span>
-                                    </div> */}
+                                {/* <div className={styles.playbackRateSlider}>
+                                    <input
+                                        type="range"
+                                        min="0.5"
+                                        max="3"
+                                        step="0.1"
+                                        value={playbackRate}
+                                        onChange={handlePlaybackRateChange}
+                                    />
+                                    <label>{playbackRate}</label>
+                                </div> */}
+
+                                <div className={styles.progressBackground}>
+                                    {/* <span
+                                        className={styles.previousTrack}
+                                        onClick={previousTrack}
+                                    >
+                                        <PreviousTrackSVG />
+                                    </span> */}
 
                                     <div className={styles.progressBarContainer} >
                                         <div className={styles.progressBarBackground} />
@@ -372,43 +423,25 @@ const Audio = () => {
                                             onMouseUp={handleScrubEnd}
                                             onMouseLeave={handleScrubEnd}
                                         />
-
                                     </div>
 
-                                    {/* <div>
-                                        <span
-                                            className={styles.nextTrack}
-                                            onClick={nextTrack}
-                                        >
-                                            <NextTrackSVG />
-                                        </span>
-                                    </div> */}
+                                    {/* <span
+                                        className={styles.nextTrack}
+                                        onClick={nextTrack}
+                                    >
+                                        <NextTrackSVG />
+                                    </span> */}
 
-                                    <div>
-                                        <p
-                                            className={styles.duration}
-                                            ref={durationRef}
-                                        >
-                                            0:00
-                                        </p>
-                                    </div>
+                                    <p className={styles.duration} ref={durationRef}>
+                                        0:00
+                                    </p>
 
-                                    <div>
-                                        <button
-                                            onClick={toggleLoop}
-                                            className={isLooping ? `${styles.loop} ${styles.loopActive}` : styles.loop}
-                                        >
-                                            {isLooping ?
-                                                <span >
-                                                    <LoopSVG />
-                                                </span>
-                                                :
-                                                <span >
-                                                    <LoopSVG />
-                                                </span>
-                                            }
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={toggleLoop}
+                                        className={isLooping ? `${styles.loop} ${styles.loopActive}` : styles.loop}
+                                    >
+                                        <LoopSVG />
+                                    </button>
                                 </div>
 
                                 {/* <div onClick={toggleMute}>
@@ -421,7 +454,21 @@ const Audio = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
+
+            {/* <AudioTimeline
+                audioRef={audioRef}
+                playlist={playlist}
+                currentTrack={playlist[currentTrack]}
+                playTrack={playTrack}
+                restartTrack={restartTrack}
+                isPlaying={isPlaying}
+                togglePlayPause={togglePlayPause}
+                handleTrackSelection={handleTrackSelection}
+                handleTrackEnd={handleTrackEnd}
+                nextTrack={nextTrack}
+            /> */}
+
         </>
     )
 }

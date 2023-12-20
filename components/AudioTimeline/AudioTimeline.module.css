@@ -1,0 +1,47 @@
+.timelineContainer {
+    width: 1000px;
+    height: 80px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timeline {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.marker {
+    position: absolute;
+    width: 1px;
+    height: 80px;
+    border-radius: 2rem;
+    background-color: #c0c0c0;
+}
+
+.trackSegment {
+    position: relative;
+    height: 32px;
+    border-radius: 2px;
+    z-index: 10;
+    color: black;
+    padding: 2px;
+    background: white;
+    border: 0.8px solid black;
+    box-sizing: border-box;
+    display: flex;
+    flex-grow: 1;
+    transition: flex-grow 1s ease;
+}
+
+.currentTimeIndicator {
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    background-color: red;
+    left: 0;
+    z-index: 100;
+    transition: left 0.5s ease;
+}

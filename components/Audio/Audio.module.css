@@ -33,10 +33,9 @@
     position: relative;
     z-index: 10000;
     width: 100%;
-    height: 100%;
+    height: 50px;
     padding: 8px;
     box-sizing: border-box;
-    background-color: black;
 }
 
 .audioPlayer {
@@ -234,7 +233,7 @@
     overflow: hidden;
 }
 
-.imageLoading {
+.artworkLoading {
     color: #FFF;
     animation: loading-pulse 1s linear infinite alternate;
 }
@@ -266,45 +265,43 @@
     /* padding: 12px; */
 }
 
-.playlistTitle {
-    padding: 4px 8px;
-    margin: 0;
-}
-
 .playlistTracks {
     height: 274px;
     overflow-y: scroll;
     border: 0.4px solid #ccc;
-    padding: 0 4px;
+    /* padding: 0 4px; */
     margin-bottom: 6px;
     border-radius: 12px;
     background-color: white;
 }
 
-.playlistTracks ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 4px 0;
+.playlistTracks table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.playlistTracks li {
-    margin: 0;
-    padding: 5px;
-    border-radius: 8px;
-    border-bottom: 0.4px solid #eee;
+.playlistTracks thead th {
+    border-bottom: 2px solid #eee;
+    padding: 10px;
+    font-size: 8px;
+    color: #cdcdcd;
+    background-color: #f9f9f9;
+    text-align: left;
+}
+
+.playlistTracks tbody tr {
     transition: background-color 0.4s ease-in-out;
     cursor: pointer;
-    /* gap: 24px; */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-    justify-content: space-between;
 }
 
-.playlistTracks p {
-    margin: 0;
-    padding: 5px;
+.playlistTracks tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.playlistTracks tbody td {
+    padding: 10px;
+    border-bottom: 0.4px solid #eee;
+    text-align: left;
 }
 
 .activeTrack {
