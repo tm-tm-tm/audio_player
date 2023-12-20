@@ -46,6 +46,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import styles from './AudioTimeline.module.css'; // Import your CSS module here
+import Ellipsis from '../Ellipsis/Ellipsis';
 
 const AudioTimeline = ({ playlist, audioRef, currentTrack, isPlaying, togglePlayPause, handleTrackSelection, handlTrackEnd, nextTrack, playTrack, restartTrack }) => {
     const [loading, setLoading] = useState(null)
