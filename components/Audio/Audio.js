@@ -15,7 +15,6 @@ import PreviousTrackSVG from '@/assets/svg/PreviousTrackSVG'
 import NextTrackSVG from '@/assets/svg/NextTrackSVG'
 import LoopSVG from '@/assets/svg/LoopSVG'
 import Ellipsis from '../Ellipsis/Ellipsis'
-import AudioTimeline from '../AudioTimeline/AudioTimeline'
 
 const Audio = () => {
     const audioRef = useRef()
