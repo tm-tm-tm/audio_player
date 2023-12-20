@@ -346,9 +346,10 @@ const Audio = () => {
                                     loading ?
                                         <tr>
                                             <td>
-                                                <p>
+                                                Loading ...
+                                                {/* <p>
                                                     loading <Ellipsis />
-                                                </p>
+                                                </p> */}
                                             </td>
                                         </tr>
                                         :
