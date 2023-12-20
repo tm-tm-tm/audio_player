@@ -121,12 +121,6 @@ const AudioTimeline = ({ playlist, audioRef, currentTrack, isPlaying, togglePlay
                                         <p>
                                             {track.artist}
                                         </p>
-                                        {/* <p>
-                                                {formatDate(track.created_at)}
-                                            </p> */}
-                                        <p>
-                                            {/* {formatTime(track.duration)} */}
-                                        </p>
                                     </li>
                                 ))}
                             </ul>
